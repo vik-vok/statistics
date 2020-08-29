@@ -76,3 +76,30 @@ def voice_maximum_scorers():
         })
 
     return json.dumps(result)
+
+
+def voice_users_tried():
+    client = bigquery.Client('speech-similarity')
+
+    query_job = client.query(
+        """
+            select
+              OriginalVoiceId,
+              count
+              ( 
+                distinct(UserId)
+              ) as tried
+            from 
+              statistics.test
+            group by
+              OriginalVoiceId
+        """
+    )
+
+    users_tried = query_job.result()
+    results = {}
+
+    for row in users_tried:
+        results[row.OriginalVoiceId] = row.tried
+
+    return json.dumps(results)
