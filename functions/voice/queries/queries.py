@@ -1,4 +1,3 @@
-import json
 from google.cloud import bigquery
 
 
@@ -21,9 +20,11 @@ def voice_average_score():
     result = {}
 
     for row in average_scores:
-        result[row.OriginalVoiceId] = row.avg
+        result[row.OriginalVoiceId] = {
+            'avgScore': row.avg
+        }
 
-    return json.dumps(result)
+    return result
 
 
 def voice_maximum_scorers():
@@ -69,13 +70,13 @@ def voice_maximum_scorers():
     for row in max_scorers:
         orig = row.OriginalVoiceId
         if orig not in result:
-            result[orig] = []
-        result[orig].append({
+            result[orig] = {'users': []}
+        result[orig]['users'].append({
             'UserId' : row.UserId,
             'Score': row.Score,
         })
 
-    return json.dumps(result)
+    return result
 
 
 def voice_users_tried():
@@ -100,6 +101,8 @@ def voice_users_tried():
     results = {}
 
     for row in users_tried:
-        results[row.OriginalVoiceId] = row.tried
+        results[row.OriginalVoiceId] = {
+            'numberTried': row.tried
+        }
 
-    return json.dumps(results)
+    return results
