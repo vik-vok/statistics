@@ -146,3 +146,5 @@ def get_one_voice_statistics(request):
 
     return json.dumps(result)
 
+# if __name__ == '__main__':
+#     print(voice_average_score())
