@@ -24,8 +24,8 @@ def voice_average_score():
         result[row.OriginalVoiceId] = {
             'avgScore': row.avgg
         }
-    print("yeeee")
-    print(result)
+    # print("yeeee")
+    # print(result)
     return result
 
 
