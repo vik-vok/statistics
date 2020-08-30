@@ -1,5 +1,5 @@
 BUILD_CONF='workflows/cloudbuild_template.yaml'
-REPO_NAME="voice"
+REPO_NAME="statistics"
 REPO_OWNER="vik-vok"
 
 # cloud-func-name | py_func_name | dir

@@ -24,6 +24,9 @@ def get_one_voice_statistics(request):
         voice_id = request_json['originalVoiceId']
     elif request_args and 'originalVoiceId' in request_args:
         voice_id = int(request_args['originalVoiceId'])
+    else:
+        # return error apiresponse
+        return ""
 
     result = {}
     result.update(queries.voice_users_tried()[voice_id])
