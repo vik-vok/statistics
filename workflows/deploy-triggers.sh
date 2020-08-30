@@ -4,8 +4,8 @@ REPO_OWNER="vik-vok"
 
 # cloud-func-name | py_func_name | dir
 array=(
-  'statistics-all-voice-get':'get_one_voice_statistics':'functions/voice'
-  'statistics-one-voice-get':'get_all_voice_statistics':'functions/voice'
+  'statistics-all-voice-get':'get_all_voice_statistics':'functions/voice'
+  'statistics-one-voice-get':'get_one_voice_statistics':'functions/voice'
 )
 
 for i in "${array[@]}"; do
