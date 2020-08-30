@@ -8,9 +8,9 @@ def voice_average_score():
     query_job = client.query(
         """
             select 
-                OriginalVoiceId, AVG(Score) as avg
+                OriginalVoiceId, AVG(Score) as avgg
             from 
-                statistics.test 
+                statistics.recorded_voices 
             group by
                 OriginalVoiceId
         """
@@ -22,7 +22,7 @@ def voice_average_score():
 
     for row in average_scores:
         result[row.OriginalVoiceId] = {
-            'avgScore': row.avg
+            'avgScore': row.avgg
         }
 
     return result
@@ -51,7 +51,7 @@ def voice_maximum_scorers():
               as 
                 rn
               from 
-                statistics.test
+                statistics.recorded_voices
             )
             select 
               OriginalVoiceId, UserId, Score, rn
@@ -92,7 +92,7 @@ def voice_users_tried():
                 distinct(UserId)
               ) as tried
             from 
-              statistics.test
+              statistics.recorded_voices
             group by
               OriginalVoiceId
         """
@@ -113,6 +113,10 @@ def get_all_voice_statistics(request):
     users_tried = voice_users_tried()
     average_scores = voice_average_score()
     max_scorers = voice_maximum_scorers()
+
+    print(users_tried)
+    print(average_scores)
+    print(max_scorers)
 
     result = {}
     for voice_id in users_tried.keys():
