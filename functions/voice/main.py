@@ -1,11 +1,118 @@
 import json
-from .queries import queries
+from google.cloud import bigquery
+
+
+def voice_average_score():
+    client = bigquery.Client('speech-similarity')
+
+    query_job = client.query(
+        """
+            select 
+                OriginalVoiceId, AVG(Score) as avg
+            from 
+                statistics.test 
+            group by
+                OriginalVoiceId
+        """
+    )
+
+    average_scores = query_job.result()
+
+    result = {}
+
+    for row in average_scores:
+        result[row.OriginalVoiceId] = {
+            'avgScore': row.avg
+        }
+
+    return result
+
+
+def voice_maximum_scorers():
+    # TOP = 3
+    client = bigquery.Client('speech-similarity')
+
+    query_job = client.query(
+        """
+            with
+              cte 
+            as
+            ( 
+              select 
+                OriginalVoiceId, UserId, Score, ROW_NUMBER() 
+              over 
+              (
+                partition by 
+                  OriginalVoiceId
+                order by 
+                  Score 
+                desc
+              )
+              as 
+                rn
+              from 
+                statistics.test
+            )
+            select 
+              OriginalVoiceId, UserId, Score, rn
+            from 
+              cte
+            where 
+              rn <= 3
+            order by 
+              OriginalVoiceId, rn 
+        """
+
+    )
+
+    max_scorers = query_job.result()
+    result = {}
+
+    for row in max_scorers:
+        orig = row.OriginalVoiceId
+        if orig not in result:
+            result[orig] = {'users': []}
+        result[orig]['users'].append({
+            'UserId' : row.UserId,
+            'Score': row.Score,
+        })
+
+    return result
+
+
+def voice_users_tried():
+    client = bigquery.Client('speech-similarity')
+
+    query_job = client.query(
+        """
+            select
+              OriginalVoiceId,
+              count
+              ( 
+                distinct(UserId)
+              ) as tried
+            from 
+              statistics.test
+            group by
+              OriginalVoiceId
+        """
+    )
+
+    users_tried = query_job.result()
+    results = {}
+
+    for row in users_tried:
+        results[row.OriginalVoiceId] = {
+            'numberTried': row.tried
+        }
+
+    return results
 
 
 def get_all_voice_statistics(request):
-    users_tried = queries.voice_users_tried()
-    average_scores = queries.voice_average_score()
-    max_scorers = queries.voice_maximum_scorers()
+    users_tried = voice_users_tried()
+    average_scores = voice_average_score()
+    max_scorers = voice_maximum_scorers()
 
     result = {}
     for voice_id in users_tried.keys():
@@ -29,9 +136,9 @@ def get_one_voice_statistics(request):
         return ""
 
     result = {}
-    result.update(queries.voice_users_tried()[voice_id])
-    result.update(queries.voice_average_score()[voice_id])
-    result.update(queries.voice_maximum_scorers()[voice_id])
+    result.update(voice_users_tried()[voice_id])
+    result.update(voice_average_score()[voice_id])
+    result.update(voice_maximum_scorers()[voice_id])
 
     return json.dumps(result)
 
