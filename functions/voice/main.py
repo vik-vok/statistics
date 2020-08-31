@@ -72,9 +72,9 @@ def voice_maximum_scorers():
     for row in max_scorers:
         orig = row.OriginalVoiceId
         if orig not in result:
-            result[orig] = {'users': []}
-        result[orig]['users'].append({
-            'UserId' : row.UserId,
+            result[orig] = {'maxScorers': []}
+        result[orig]['maxScorers'].append({
+            'UserId': row.UserId,
             'Score': row.Score,
         })
 
@@ -121,9 +121,9 @@ def get_all_voice_statistics(request):
 
     result = {}
     for voice_id in users_tried.keys():
-        statistics = {'usersTried': users_tried[voice_id],
-                      'averageScorers': average_scores[voice_id],
-                      'maxScorers': max_scorers[voice_id]}
+        statistics = {**users_tried[voice_id],
+                      **average_scores[voice_id],
+                      **max_scorers[voice_id]}
         result[voice_id] = statistics
 
     return json.dumps(result)
