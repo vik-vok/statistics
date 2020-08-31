@@ -124,7 +124,7 @@ def get_all_voice_statistics(request):
         statistics = {'usersTried': users_tried[voice_id],
                       'averageScorers': average_scores[voice_id],
                       'maxScorers': max_scorers[voice_id]}
-        result['originalVoiceId'] = statistics
+        result[voice_id] = statistics
 
     return json.dumps(result)
 
