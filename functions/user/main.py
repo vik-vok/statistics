@@ -14,7 +14,7 @@ def popular_voices():
     return {"popular_voices": ["123", "124", "124"]}
 
 
-def get_users_statistics(request):
+def get_user_statistics(request):
     request_json = request.get_json(silent=True)
     request_args = request.args
     if request_json and 'userId' in request_json:
@@ -22,6 +22,5 @@ def get_users_statistics(request):
     elif request_args and 'userId' in request_args:
         voice_id = int(request_args['userId'])
     else:
-        # return error apiresponse
         return ""
     return {**maximum_scores(), **scores_by_time(), **popular_voices()}

@@ -6,6 +6,8 @@ REPO_OWNER="vik-vok"
 array=(
   'statistics-all-voice-get':'get_all_voice_statistics':'functions/voice'
   'statistics-one-voice-get':'get_one_voice_statistics':'functions/voice'
+
+  'statistics-user-get':'get_user_statistics':'functions/user'
 )
 
 for i in "${array[@]}"; do
