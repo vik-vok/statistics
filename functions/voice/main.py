@@ -3,7 +3,7 @@ from google.cloud import bigquery
 
 
 def voice_average_score():
-    client = bigquery.Client('speech-similarity')
+    client = bigquery.Client("speech-similarity")
 
     query_job = client.query(
         """
@@ -21,9 +21,7 @@ def voice_average_score():
     result = {}
 
     for row in average_scores:
-        result[row.OriginalVoiceId] = {
-            'avgScore': row.avgg
-        }
+        result[row.OriginalVoiceId] = {"avgScore": row.avgg}
     # print("yeeee")
     # print(result)
     return result
@@ -31,7 +29,7 @@ def voice_average_score():
 
 def voice_maximum_scorers():
     # TOP = 3
-    client = bigquery.Client('speech-similarity')
+    client = bigquery.Client("speech-similarity")
 
     query_job = client.query(
         """
@@ -63,7 +61,6 @@ def voice_maximum_scorers():
             order by 
               OriginalVoiceId, rn 
         """
-
     )
 
     max_scorers = query_job.result()
@@ -72,17 +69,16 @@ def voice_maximum_scorers():
     for row in max_scorers:
         orig = row.OriginalVoiceId
         if orig not in result:
-            result[orig] = {'maxScorers': []}
-        result[orig]['maxScorers'].append({
-            'UserId': row.UserId,
-            'Score': row.Score,
-        })
+            result[orig] = {"maxScorers": []}
+        result[orig]["maxScorers"].append(
+            {"UserId": row.UserId, "Score": row.Score,}
+        )
 
     return result
 
 
 def voice_users_tried():
-    client = bigquery.Client('speech-similarity')
+    client = bigquery.Client("speech-similarity")
 
     query_job = client.query(
         """
@@ -103,9 +99,7 @@ def voice_users_tried():
     results = {}
 
     for row in users_tried:
-        results[row.OriginalVoiceId] = {
-            'numberTried': row.tried
-        }
+        results[row.OriginalVoiceId] = {"numberTried": row.tried}
 
     return results
 
@@ -121,9 +115,11 @@ def get_all_voice_statistics(request):
 
     result = {}
     for voice_id in users_tried.keys():
-        statistics = {**users_tried[voice_id],
-                      **average_scores[voice_id],
-                      **max_scorers[voice_id]}
+        statistics = {
+            **users_tried[voice_id],
+            **average_scores[voice_id],
+            **max_scorers[voice_id],
+        }
         result[voice_id] = statistics
 
     return json.dumps(result)
@@ -132,20 +128,20 @@ def get_all_voice_statistics(request):
 def get_one_voice_statistics(request):
     request_json = request.get_json(silent=True)
     request_args = request.args
-    if request_json and 'originalVoiceId' in request_json:
-        voice_id = request_json['originalVoiceId']
-    elif request_args and 'originalVoiceId' in request_args:
-        voice_id = int(request_args['originalVoiceId'])
+    if request_json and "originalVoiceId" in request_json:
+        voiceId = request_json["originalVoiceId"]
+    elif request_args and "originalVoiceId" in request_args:
+        voiceId = request_args["originalVoiceId"]
     else:
-        # return error apiresponse
-        return ""
+        return (json.dumps({"error": "Missing parameter: originalVoiceId"}), 422, {})
 
     result = {}
-    result.update(voice_users_tried()[voice_id])
-    result.update(voice_average_score()[voice_id])
-    result.update(voice_maximum_scorers()[voice_id])
+    result.update(voice_users_tried()[str(voiceId)])
+    result.update(voice_average_score()[str(voiceId)])
+    result.update(voice_maximum_scorers()[str(voiceId)])
 
     return json.dumps(result)
+
 
 # if __name__ == '__main__':
 #     print(voice_average_score())
